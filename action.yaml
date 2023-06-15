@@ -1,0 +1,84 @@
+name: Alphadoc API upload
+description: Upload and Publish OpenAPI specs in alphadoc
+
+inputs:
+  OPENAPI_FILE:
+    description: "Relative path to the OpenAPI file from the root of your repo"
+    required: true
+  PROJECT_ID:
+    description: "Alphadoc Project ID"
+    required: true
+  DOCUMENT_ID:
+    description: "Alphadoc Document ID"
+    required: true
+  USERNAME:
+    description: "Name of the user"
+    required: true
+  PASSWORD:
+    description: "Password of the user. Store this in a Github Secret."
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Convert JSON to base64
+      shell: bash
+      run: |
+        base64_file=$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})
+        echo "base64=$base64_file" >> $GITHUB_ENV
+
+    - name: Authenticate
+      shell: bash
+      run: |
+        ID_TOKEN=$(aws cognito-idp initiate-auth \
+          --region eu-west-1 \
+          --auth-flow=USER_PASSWORD_AUTH \
+          --client-id=750p3per77spo8ktilg2f8sl2d \
+          --auth-parameters='PASSWORD=${{ inputs.PASSWORD }},USERNAME=${{ inputs.USERNAME }}' \
+          --query=AuthenticationResult.IdToken --debug)
+        echo "token=$ID_TOKEN" >> $GITHUB_ENV
+
+    - name: Upload OpenAPI and get versionId
+      shell: bash
+      run: |
+        version_response=$(curl -X POST \
+          -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "default": true,
+            "document": "${{ env.base64 }}",
+            "documentType": "application/json"
+          }' \
+          "https://docs.staging.alphadoc.dev/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
+        version_id=$(echo "$version_response" | jq -r '.id')
+        echo "versionId=$version_id" >> $GITHUB_ENV
+
+    - name: Publish document
+      shell: bash
+      run: |
+        curl -f -X PATCH \
+          -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "default": true
+          }' \
+          "https://docs.staging.alphadoc.dev/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
+
+    - name: Set new document title and description
+      shell: bash
+      run: |
+        timestamp=$(date +%Y-%m-%d-%H-%M-%S)
+        title="new bikeshop: $timestamp"
+        description="bikeshop-$timestamp.json"
+
+        curl -f -X PATCH \
+          -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json" \
+          -d '{
+            "title": "'"$title"'",
+            "description": "'"$description"'"
+          }' \
+          "https://docs.staging.alphadoc.dev/v1/projects/${{ inputs.PROJECT_ID }}/documents/${{ inputs.DOCUMENT_ID }}"
