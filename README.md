@@ -42,3 +42,8 @@ jobs:
 | DOCUMENT_ID  | Alphadoc Document ID                                         |
 | USERNAME     | Name of the user                                             |
 | PASSWORD     | Password of the user. Store this in a Github Secret.         |
+
+## Development
+
+The master branch is `v1`. Contributions are welcome! Please create a
+[Pull Request](https://github.com/alphadoc-io/action-update-api/pulls)
