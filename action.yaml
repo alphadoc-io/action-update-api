@@ -34,17 +34,17 @@ runs:
       shell: bash
       run: |
         ID_TOKEN=$(aws cognito-idp initiate-auth \
+          --client-id=750p3per77spo8ktilg2f8sl2d \
           --region eu-west-1 \
           --auth-flow=USER_PASSWORD_AUTH \
-          --client-id=750p3per77spo8ktilg2f8sl2d \
           --auth-parameters='PASSWORD=${{ inputs.PASSWORD }},USERNAME=${{ inputs.USERNAME }}' \
-          --query=AuthenticationResult.IdToken --debug)
+          --query=AuthenticationResult.IdToken)
         echo "token=$ID_TOKEN" >> $GITHUB_ENV
 
     - name: Upload OpenAPI and get versionId
       shell: bash
       run: |
-        version_response=$(curl -X POST \
+        version_response=$(curl -f -s -X POST \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
           -d '{
@@ -59,12 +59,10 @@ runs:
     - name: Publish document
       shell: bash
       run: |
-        curl -f -X PATCH \
+        curl -f -s -X PATCH \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
-          -d '{
-            "default": true
-          }' \
+          -d '{ "default": true }' \
           "https://docs.staging.alphadoc.dev/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
 
     - name: Set new document title and description
@@ -74,7 +72,7 @@ runs:
         title="new bikeshop: $timestamp"
         description="bikeshop-$timestamp.json"
 
-        curl -f -X PATCH \
+        curl -f -s -X PATCH \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
           -d '{
