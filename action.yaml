@@ -5,6 +5,9 @@ inputs:
   OPENAPI_FILE:
     description: "Relative path to the OpenAPI file from the root of your repo"
     required: true
+  ORGANISATION:
+    description: "Alphadoc organisation name, subdomain of your url."
+    required: true
   PROJECT_ID:
     description: "Alphadoc Project ID"
     required: true
@@ -52,7 +55,7 @@ runs:
             "document": "${{ env.base64 }}",
             "documentType": "application/json"
           }' \
-          "https://docs.staging.alphadoc.dev/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
+          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
         version_id=$(echo "$version_response" | jq -r '.id')
         echo "versionId=$version_id" >> $GITHUB_ENV
 
@@ -63,20 +66,4 @@ runs:
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
           -d '{ "default": true }' \
-          "https://docs.staging.alphadoc.dev/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
-
-    - name: Set new document title and description
-      shell: bash
-      run: |
-        timestamp=$(date +%Y-%m-%d-%H-%M-%S)
-        title="new bikeshop: $timestamp"
-        description="bikeshop-$timestamp.json"
-
-        curl -f -s -X PATCH \
-          -H "Authorization: Bearer ${{ env.token }}" \
-          -H "Content-Type: application/json" \
-          -d '{
-            "title": "'"$title"'",
-            "description": "'"$description"'"
-          }' \
-          "https://docs.staging.alphadoc.dev/v1/projects/${{ inputs.PROJECT_ID }}/documents/${{ inputs.DOCUMENT_ID }}"
+          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
