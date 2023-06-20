@@ -28,7 +28,13 @@ Follow the same steps as for the Project ID to configure the Document ID as a Gi
 
 ### Alphadoc Username and Password
 
-As the final step of the process, save your Alphadoc username (email) and password as [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#about-encrypted-secrets) in Github. Save them as "ALPHADOC_USERNAME" and "ALPHADOC_PASSWORD".
+As the final step of the process, generate an Alpadoc API Key by visiting
+`<ORGANIZATION>.alphadoc.io/editor/settings/organization?section=api_key`
+and clicking `Generate API Key`.
+
+Copy the generated API key to you clipboard and go to
+[secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#about-encrypted-secrets)
+in Github. Save the secret as "ALPHADOC_APIKEY".
 
 ### Location of OpenAPI file
 
@@ -59,8 +65,7 @@ jobs:
           ORGANISATION: ${{ vars.ALPHADOC_ORGANISATION }}
           PROJECT_ID: ${{ vars.ALPHADOC_PROJECT_ID }}
           DOCUMENT_ID: ${{ vars.ALPHADOC_DOCUMENT_ID }}
-          USERNAME: ${{ secrets.ALPHADOC_USERNAME }}
-          PASSWORD: ${{ secrets.ALPHADOC_PASSWORD }}
+          APIKEY: ${{ secrets.ALPHADOC_APIKEY }}
 ```
 
 ## Parameters
