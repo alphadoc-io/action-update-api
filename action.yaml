@@ -38,7 +38,7 @@ runs:
           -H "Authorization: Basic NmhydjEzMDFicjB2NGJnZGZvaGEyajh0b246OXRtdDJwbmxobjE2MHM3OGdhM3I3YnZqOW5kYWFkNWYyMjZobDlvbmFnYzhmZjM0ODIx" \
           --data-urlencode "client_id=6hrv1301br0v4bgdfoha2j8ton" \
           --data-urlencode "grant_type=refresh_token" \
-          --data-urlencode "refresh_token=${{ inputs.APIKEY }}")
+          --data-urlencode "refresh_token=${{ inputs.APIKEY }}"  | jq -r '.access_token')
         echo "token=$ID_TOKEN" >> $GITHUB_ENV
 
     - name: Upload OpenAPI and get versionId
