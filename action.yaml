@@ -51,7 +51,6 @@ runs:
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
           -d '{
-            "default": true,
             "document": "${{ env.base64 }}",
             "documentType": "application/json"
           }' \
@@ -62,8 +61,7 @@ runs:
     - name: Publish document
       shell: bash
       run: |
-        curl -f -s -X PATCH \
+        curl -f -s -X PUT \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
-          -d '{ "default": true }' \
-          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
+          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}/publish"
