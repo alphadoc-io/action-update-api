@@ -62,7 +62,7 @@ runs:
         version_response=$(curl -f -s -X POST \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
-          --data-binary "@./body.json" \
+          --data-binary "@body.json" \
           "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
         version_id=$(echo "$version_response" | jq -r '.id')
         echo "versionId=$version_id" >> $GITHUB_ENV
@@ -84,7 +84,7 @@ runs:
         version_response=$(curl -f -s -X POST \
           -H "x-api-key: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
-          --data-binary "@./body.json" \
+          --data-binary "@body.json" \
           "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
         version_id=$(echo "$version_response" | jq -r '.id')
         echo "versionId=$version_id" >> $GITHUB_ENV
