@@ -43,6 +43,7 @@ runs:
         echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
     
     - name: Display body.json content
+      shell: bash
       run: cat body.json
         
     - name: Authenticate using username and password
