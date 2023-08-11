@@ -35,6 +35,7 @@ runs:
       if: ${{ inputs.APIKEY }} = true
       shell: bash
       run: |
+        echo "APIKEY is ${{inputs.APIKEY}}"
         echo "USE_APIKEY=true" >> $GITHUB_ENV
         echo "USE_APIKEY value is $USE_APIKEY"
         
