@@ -24,6 +24,7 @@ inputs:
     description: If API key is provided, Username and Password are ignored. Generate
       the key in the Alphadoc dashboard. Store this value in a Github Secret.
     required: false
+    
 runs:
   using: composite
   steps:
@@ -31,10 +32,11 @@ runs:
       uses: actions/checkout@v3
       
     - name: Check if API key is provided
-      if: ${{ inputs.APIKEY }} != ""
+      if: inputs.APIKEY != ""
       shell: bash
       run: |
         echo "USE_APIKEY=true" >> $GITHUB_ENV
+        echo "USE_APIKEY value is $USE_APIKEY"
         
     - name: Convert JSON to binary
       shell: bash
