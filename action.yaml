@@ -1,9 +1,6 @@
 name: Alphadoc API upload
 description: Upload and Publish OpenAPI specs in alphadoc
 
-env:
-  USE_APIKEY: ${{ inputs.APIKEY != "" }}
-
 inputs:
   OPENAPI_FILE:
     description: "Relative path to the OpenAPI file from the root of your repo"
@@ -33,13 +30,19 @@ runs:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Check if API key is provided
+      if: ${{ inputs.APIKEY }} != "" 
+      shell: bash
+      run: |
+        echo "USE_APIKEY=true" >> $GITHUB_ENV
+
     - name: Convert JSON to binary
       shell: bash
       run: |
         echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
 
     - name: Authenticate using username and password
-      if: ${{ env.USE_APIKEY }}
+      if: !${{ env.USE_APIKEY }}
       shell: bash
       run: |
         ID_TOKEN=$(aws cognito-idp initiate-auth \
@@ -51,7 +54,7 @@ runs:
         echo "token=$ID_TOKEN" >> $GITHUB_ENV
 
     - name: Upload OpenAPI and get versionId with username and password
-      if: ${{ env.USE_APIKEY }}
+      if: !${{ env.USE_APIKEY }}
       shell: bash
       run: |
         version_response=$(curl -f -s -X POST \
@@ -61,13 +64,13 @@ runs:
           "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
         version_id=$(echo "$version_response" | jq -r '.id')
         echo "versionId=$version_id" >> $GITHUB_ENV
-
-    - name: Publish document with API key
-      if: ${{ env.USE_APIKEY }}
+        
+    - name: Publish document with username and password
+      if: !${{ env.USE_APIKEY }}
       shell: bash
       run: |
         curl -f -s -X PUT \
-          -H "x-api-key: ${{ inputs.APIKEY }}" \
+          -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
           "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}/publish"
 
@@ -83,7 +86,7 @@ runs:
         version_id=$(echo "$version_response" | jq -r '.id')
         echo "versionId=$version_id" >> $GITHUB_ENV
 
-    - name: Publish document with username and password
+    - name: Publish document with API key
       if: ${{ env.USE_APIKEY }}
       shell: bash
       run: |
