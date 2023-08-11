@@ -42,8 +42,7 @@ runs:
     - name: Convert JSON to binary
       shell: bash
       run: >
-        echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE
-        }})\",\"documentType\": \"application/json\"}" > body.json
+        echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
         
     - name: Authenticate using username and password
       if: inputs.APIKEY == false
