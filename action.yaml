@@ -58,6 +58,7 @@ runs:
       if: inputs.APIKEY == false
       shell: bash
       run: >
+        echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
         version_response=$(curl -f -s -X POST \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
@@ -79,6 +80,7 @@ runs:
       if: inputs.APIKEY != ''
       shell: bash
       run: >
+        echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
         version_response=$(curl -f -s -X POST \
           -H "x-api-key: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
