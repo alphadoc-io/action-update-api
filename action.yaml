@@ -87,6 +87,7 @@ runs:
           --data-binary "@body.json" \
           "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
         version_id=$(echo "$version_response" | jq -r '.id')
+        echo "version_response: $version_response"
         echo "versionId=$version_id" >> $GITHUB_ENV
         
     - name: Publish document with API key
