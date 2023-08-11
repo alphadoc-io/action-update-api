@@ -45,7 +45,7 @@ runs:
     - name: Authenticate using username and password
       if: inputs.APIKEY == false
       shell: bash
-      run: >
+      run: |
         ID_TOKEN=$(aws cognito-idp initiate-auth \
           --client-id=750p3per77spo8ktilg2f8sl2d \
           --region eu-west-1 \
@@ -57,7 +57,7 @@ runs:
     - name: Upload OpenAPI and get versionId with username and password
       if: inputs.APIKEY == false
       shell: bash
-      run: >
+      run: |
         echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
         version_response=$(curl -f -s -X POST \
           -H "Authorization: Bearer ${{ env.token }}" \
@@ -70,7 +70,7 @@ runs:
     - name: Publish document with username and password
       if: inputs.APIKEY == false
       shell: bash
-      run: >
+      run: |
         curl -f -s -X PUT \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
@@ -79,7 +79,7 @@ runs:
     - name: Upload OpenAPI and get versionId with API key
       if: inputs.APIKEY != ''
       shell: bash
-      run: >
+      run: |
         echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
         version_response=$(curl -f -s -X POST \
           -H "x-api-key: ${{ inputs.APIKEY }}" \
@@ -92,7 +92,7 @@ runs:
     - name: Publish document with API key
       if: inputs.APIKEY != ''
       shell: bash
-      run: >
+      run: |
         curl -f -s -X PUT \
           -H "x-api-key: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
