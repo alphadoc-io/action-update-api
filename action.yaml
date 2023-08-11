@@ -43,7 +43,7 @@ runs:
         }})\",\"documentType\": \"application/json\"}" > body.json
         
     - name: Authenticate using username and password
-      if: ""
+      if: !env.USE_APIKEY
       shell: bash
       run: >
         ID_TOKEN=$(aws cognito-idp initiate-auth \
@@ -55,7 +55,7 @@ runs:
         echo "token=$ID_TOKEN" >> $GITHUB_ENV
         
     - name: Upload OpenAPI and get versionId with username and password
-      if: ""
+      if: !env.USE_APIKEY
       shell: bash
       run: >
         version_response=$(curl -f -s -X POST \
@@ -67,7 +67,7 @@ runs:
         echo "versionId=$version_id" >> $GITHUB_ENV
         
     - name: Publish document with username and password
-      if: ""
+      if: !env.USE_APIKEY
       shell: bash
       run: >
         curl -f -s -X PUT \
