@@ -32,12 +32,10 @@ runs:
       uses: actions/checkout@v3
       
     - name: Check if API key is provided
-      if: inputs.APIKEY == true
+      if: inputs.APIKEY != ""
       shell: bash
       run: |
-        echo "APIKEY is ${{inputs.APIKEY}}"
-        echo "USE_APIKEY=true" >> $GITHUB_ENV
-        echo "USE_APIKEY value is ${{env.USE_APIKEY}}"
+        echo "APIKEY is provided"
         
     - name: Convert JSON to binary
       shell: bash
@@ -78,7 +76,7 @@ runs:
           "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}/publish"
           
     - name: Upload OpenAPI and get versionId with API key
-      if: inputs.APIKEY == true
+      if: inputs.APIKEY != ""
       shell: bash
       run: >
         version_response=$(curl -f -s -X POST \
@@ -90,7 +88,7 @@ runs:
         echo "versionId=$version_id" >> $GITHUB_ENV
         
     - name: Publish document with API key
-      if: inputs.APIKEY == true
+      if: inputs.APIKEY != ""
       shell: bash
       run: >
         curl -f -s -X PUT \
