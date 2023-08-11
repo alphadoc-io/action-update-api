@@ -85,7 +85,7 @@ runs:
       shell: bash
       run: |
         echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
-        version_id=$(curl --write-out -f -s -X POST \
+        version_id=$(curl -f -s -w "%{http_code}" -X POST \
           -H "x-api-key: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
           --data-binary "@body.json" \
