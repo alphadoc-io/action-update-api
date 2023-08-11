@@ -37,7 +37,7 @@ runs:
       run: |
         echo "APIKEY is ${{inputs.APIKEY}}"
         echo "USE_APIKEY=true" >> $GITHUB_ENV
-        echo "USE_APIKEY value is $USE_APIKEY"
+        echo "USE_APIKEY value is ${{env.USE_APIKEY}}"
         
     - name: Convert JSON to binary
       shell: bash
