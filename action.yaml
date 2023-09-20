@@ -37,7 +37,6 @@ runs:
           -H "X-API-KEY: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
           -d '{
-            "default": true,
             "document": "${{ env.base64 }}",
             "documentType": "application/json"
           }' \
@@ -51,5 +50,4 @@ runs:
         curl -f -s -X PATCH \
           -H "X-API-KEY: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
-          -d '{ "default": true }' \
-          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
+          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}/publish"

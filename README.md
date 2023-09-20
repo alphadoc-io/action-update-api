@@ -41,6 +41,10 @@ in Github. Save the secret as "ALPHADOC_APIKEY".
 The final step is to add the location of your OpenAPI file in your repo to the workflow .yaml file as "OPENAPI_FILE".
 
 ## Usage
+### Generated Action
+You can generate a GitHub Action per API directly from the "API Uploads" section in Alphadoc. Just copy it, and set up the location of your API and your username/password.
+
+### Custom Action
 
 Here is an example workflow. Save it as `action-update-api.yaml` in the `.github/workflows/` folder in the root of your GitHub repository.
 
