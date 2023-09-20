@@ -33,13 +33,21 @@ runs:
     - name: Authenticate
       shell: bash
       run: |
+        ID_TOKEN=$(curl -f -s \
+          --data-urlencode 'client_id=750p3per77spo8ktilg2f8sl2d' \
+          --data-urlencode 'grant_type=refresh_token' \
+          --data-urlencode 'refresh_token=' \
+          "https://alphadoc.auth.eu-west-1.amazoncognito.com/oauth2/token"  | jq -r ".access_token")
+
+
+
         ID_TOKEN=$(curl -f -s -X POST \
           -H "Content-Type: application/x-www-form-urlencoded" \
           -H "Authorization: Basic NmhydjEzMDFicjB2NGJnZGZvaGEyajh0b246OXRtdDJwbmxobjE2MHM3OGdhM3I3YnZqOW5kYWFkNWYyMjZobDlvbmFnYzhmZjM0ODIx" \
           --data-urlencode "client_id=6hrv1301br0v4bgdfoha2j8ton" \
           --data-urlencode "grant_type=refresh_token" \
           --data-urlencode "refresh_token=${{ inputs.APIKEY }}" \
-          https://alphadoc.auth.eu-west-1.amazoncognito.com/oauth2/token | jq -r '.access_token')
+          "https://alphadoc.auth.eu-west-1.amazoncognito.com/oauth2/token" | jq -r '.access_token')
         echo "token=$ID_TOKEN" >> $GITHUB_ENV
 
     - name: Upload OpenAPI and get versionId
