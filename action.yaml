@@ -1,39 +1,53 @@
+---
 name: Alphadoc API upload
 description: Upload and Publish OpenAPI specs in alphadoc
-
 inputs:
   OPENAPI_FILE:
-    description: "Relative path to the OpenAPI file from the root of your repo"
+    description: Relative path to the OpenAPI file from the root of your repo
     required: true
   ORGANISATION:
-    description: "Alphadoc organisation name, subdomain of your url."
+    description: Alphadoc organisation name, subdomain of your url.
     required: true
   PROJECT_ID:
-    description: "Alphadoc Project ID"
+    description: Alphadoc Project ID
     required: true
   DOCUMENT_ID:
-    description: "Alphadoc Document ID"
+    description: Alphadoc Document ID
     required: true
   USERNAME:
-    description: "Name of the user"
-    required: true
+    description: Name of the user
+    required: false
   PASSWORD:
-    description: "Password of the user. Store this in a Github Secret."
-    required: true
-
+    description: Password of the user. Store this in a Github Secret.
+    required: false
+  APIKEY:
+    description: If API key is provided, Username and Password are ignored. Generate
+      the key in the Alphadoc dashboard. Store this value in a Github Secret.
+    required: false
+    
 runs:
-  using: "composite"
+  using: composite
   steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
-    - name: Convert JSON to base64
+      
+    - name: Check if API key is provided
+      if: inputs.APIKEY != ''
       shell: bash
       run: |
-        base64_file=$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})
-        echo "base64=$base64_file" >> $GITHUB_ENV
-
-    - name: Authenticate
+        echo "APIKEY is provided"
+        
+    - name: Convert JSON to binary
+      shell: bash
+      run: >
+        echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
+    
+    - name: Display body.json content
+      shell: bash
+      run: cat body.json
+        
+    - name: Authenticate using username and password
+      if: inputs.APIKEY == false
       shell: bash
       run: |
         ID_TOKEN=$(aws cognito-idp initiate-auth \
@@ -43,25 +57,47 @@ runs:
           --auth-parameters='PASSWORD=${{ inputs.PASSWORD }},USERNAME=${{ inputs.USERNAME }}' \
           --query=AuthenticationResult.IdToken)
         echo "token=$ID_TOKEN" >> $GITHUB_ENV
-
-    - name: Upload OpenAPI and get versionId
+        
+    - name: Upload OpenAPI and get versionId with username and password
+      if: inputs.APIKEY == false
       shell: bash
       run: |
+        echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
         version_response=$(curl -f -s -X POST \
           -H "Authorization: Bearer ${{ env.token }}" \
           -H "Content-Type: application/json" \
-          -d '{
-            "document": "${{ env.base64 }}",
-            "documentType": "application/json"
-          }' \
+          --data-binary "@body.json" \
           "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
         version_id=$(echo "$version_response" | jq -r '.id')
         echo "versionId=$version_id" >> $GITHUB_ENV
-
-    - name: Publish document
+        
+    - name: Publish document with username and password
+      if: inputs.APIKEY == false
       shell: bash
       run: |
         curl -f -s -X PUT \
           -H "Authorization: Bearer ${{ env.token }}" \
+          -H "Content-Type: application/json" \
+          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}/publish"
+          
+    - name: Upload OpenAPI and get versionId with API key
+      if: inputs.APIKEY != ''
+      shell: bash
+      run: |
+        echo "{\"document\": \"$(base64 -w 0 ${{ inputs.OPENAPI_FILE }})\",\"documentType\": \"application/json\"}" > body.json
+        version_response=$(curl -f -s -w "%{http_code}" -X POST \
+          -H "x-api-key: ${{ inputs.APIKEY }}" \
+          -H "Content-Type: application/json" \
+          --data-binary "@body.json" \
+          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
+        version_id=$(echo "$version_response" | jq -r '.id')
+        echo "versionId=$version_id" >> $GITHUB_ENV
+        
+    - name: Publish document with API key
+      if: inputs.APIKEY != ''
+      shell: bash
+      run: |
+        curl -f -s -X PUT \
+          -H "x-api-key: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
           "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}/publish"
