@@ -1,0 +1,818 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Bikeshop API",
+		"description": "This is an API for a bikeshop made by Alphadoc.io. This example API is inteded to be used for demonstration purposes.",
+		"version": "1.3.0",
+		"contact": {
+			"email": "daan@alphadoc.io",
+			"name": "Daan Stolk",
+			"url": "https://alphadoc.io"
+		}
+	},
+	"servers": [
+		{
+			"description": "Local development server",
+			"url": "http://localhost:8080/api"
+		}
+	],
+	"security": [
+		{
+			"basic_authentication": []
+		}
+	],
+	"tags": [
+		{
+			"name": "Bikes",
+			"description": "Bikes are how we make our money!"
+		},
+		{
+			"name": "Parts",
+			"description": "Parts are the real cashcows."
+		},
+		{
+			"name": "Orders",
+			"description": "Orders reference bikes and parts."
+		}
+	],
+	"paths": {
+		"/bikes": {
+			"post": {
+				"security": [
+					{
+						"oauth2": ["write:bikes"]
+					}
+				],
+				"summary": "Create a bike",
+				"description": "Add a new bike to the store",
+				"operationId": "createBike",
+				"tags": ["Bikes"],
+				"requestBody": {
+					"$ref": "#/components/requestBodies/createBike"
+				},
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/createBike200"
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			},
+			"get": {
+				"security": [
+					{
+						"oauth2": ["read:bikes"]
+					}
+				],
+				"description": "Get all the bikes",
+				"operationId": "getAllBikes",
+				"tags": ["Bikes"],
+				"summary": "Get all bikes",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/queryParameterLimit"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"allOf": [
+											{
+												"$ref": "#/components/schemas/NewBike"
+											},
+											{
+												"$ref": "#/components/schemas/Bike"
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			}
+		},
+		"/bikes/{id}": {
+			"get": {
+				"description": "Get a bike by ID",
+				"operationId": "getBike",
+				"tags": ["Bikes"],
+				"summary": "Get a bike by ID",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "ID of bike to get",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/NewBike"
+										},
+										{
+											"$ref": "#/components/schemas/Bike"
+										}
+									]
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			},
+			"put": {
+				"security": [
+					{
+						"bearer_authentication": []
+					}
+				],
+				"summary": "Update a bike",
+				"description": "Update a bike",
+				"operationId": "updateBike",
+				"tags": ["Bikes"],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "ID of bike to get",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/NewBike"
+									},
+									{
+										"$ref": "#/components/schemas/Bike"
+									}
+								]
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "The bike was updated."
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			},
+			"delete": {
+				"description": "Delete a bike",
+				"tags": ["Bikes"],
+				"operationId": "deleteBike",
+				"summary": "Delete a bike",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "ID of bike to get",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation"
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			}
+		},
+		"/bikes/types": {
+			"get": {
+				"security": [
+					{
+						"oauth2": ["read:bikes"]
+					}
+				],
+				"description": "Get all the types for bikes",
+				"operationId": "getAllBikesTypes",
+				"tags": ["Bikes"],
+				"summary": "Get all the types for bikes",
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/getBikeTypes200"
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			}
+		},
+		"/parts": {
+			"post": {
+				"security": [
+					{
+						"oauth2": ["write:parts"]
+					}
+				],
+				"summary": "Create a part",
+				"description": "Add a new part to the store",
+				"operationId": "createPart",
+				"tags": ["Parts"],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Part"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/NewPart"
+										},
+										{
+											"$ref": "#/components/schemas/Part"
+										}
+									]
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			},
+			"get": {
+				"security": [
+					{
+						"oauth2": ["read:parts"]
+					}
+				],
+				"description": "Get all the parts",
+				"operationId": "GetAllParts",
+				"tags": ["Parts"],
+				"summary": "Get all parts",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/queryParameterLimit"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"allOf": [
+											{
+												"$ref": "#/components/schemas/NewPart"
+											},
+											{
+												"$ref": "#/components/schemas/Part"
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			}
+		},
+		"/parts/{id}": {
+			"get": {
+				"description": "Get a part by ID",
+				"operationId": "getPart",
+				"tags": ["Parts"],
+				"summary": "Get a part by ID",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "ID of part to get",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"allOf": [
+										{
+											"$ref": "#/components/schemas/NewPart"
+										},
+										{
+											"$ref": "#/components/schemas/Part"
+										}
+									]
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			},
+			"put": {
+				"security": [
+					{
+						"bearer_authentication": []
+					}
+				],
+				"summary": "Update a part",
+				"description": "Update a part",
+				"operationId": "updatePart",
+				"tags": ["Parts"],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "ID of part to get",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "object",
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/NewPart"
+									},
+									{
+										"$ref": "#/components/schemas/Part"
+									}
+								]
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Successful operation"
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			},
+			"delete": {
+				"description": "Delete a part",
+				"tags": ["Parts"],
+				"operationId": "deletePart",
+				"summary": "Delete a part",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"description": "ID of part to get",
+						"required": true,
+						"schema": {
+							"type": "integer"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation"
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			}
+		},
+		"/orders": {
+			"post": {
+				"security": [
+					{
+						"oauth2": ["write:orders"]
+					}
+				],
+				"summary": "Create an order",
+				"description": "Add a new order to the store",
+				"operationId": "createOrder",
+				"tags": ["Orders"],
+				"requestBody": {
+					"$ref": "#/components/requestBodies/createOrder"
+				},
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/createOrder200"
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			},
+			"get": {
+				"security": [
+					{
+						"oauth2": ["read:orders"]
+					}
+				],
+				"description": "Get all the orders",
+				"operationId": "getAllOrders",
+				"tags": ["Orders"],
+				"summary": "Get all orders",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/queryParameterLimit"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Successful operation",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"type": "object",
+										"allOf": [
+											{
+												"$ref": "#/components/schemas/NewOrder"
+											},
+											{
+												"$ref": "#/components/schemas/Order"
+											}
+										]
+									}
+								}
+							}
+						}
+					},
+					"401": {
+						"$ref": "#/components/responses/unauthenticatedUser401"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"NewBike": {
+				"type": "object",
+				"required": ["id"],
+				"properties": {
+					"id": {
+						"description": "ID of the bike",
+						"type": "string"
+					}
+				}
+			},
+			"Bike": {
+				"type": "object",
+				"required": ["name", "type"],
+				"properties": {
+					"name": {
+						"description": "Name of the bike",
+						"type": "string"
+					},
+					"price": {
+						"maxLength": 9,
+						"minLength": 2,
+						"description": "Price of the bike, in euro's. Without commas. So €20.00 is 2000.",
+						"type": "integer"
+					},
+					"type": {
+						"$ref": "#/components/schemas/BikeTypes"
+					}
+				}
+			},
+			"BikeTypes": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"description": "Type of bike",
+						"type": "string",
+						"enum": ["Road", "MTB", "City", "Cargo"]
+					}
+				}
+			},
+			"NewPart": {
+				"type": "object",
+				"required": ["id"],
+				"properties": {
+					"id": {
+						"description": "ID of the part",
+						"type": "string"
+					}
+				}
+			},
+			"Part": {
+				"type": "object",
+				"required": ["name", "type", "price"],
+				"properties": {
+					"name": {
+						"description": "Name of the part",
+						"type": "string"
+					},
+					"price": {
+						"maxLength": 9,
+						"minLength": 2,
+						"description": "Price of the part, in euro's. Without commas. So €20.00 is 2000.",
+						"type": "integer"
+					},
+					"type": {
+						"description": "Type of part",
+						"type": "object",
+						"oneOf": [
+							{
+								"properties": {
+									"Chassis": {
+										"description": "Chassis part of the bike",
+										"type": "object",
+										"properties": {
+											"area": {
+												"description": "type of chassis part",
+												"type": "string",
+												"enum": ["Frame", "Sadel", "Steering"]
+											}
+										}
+									}
+								}
+							},
+							{
+								"properties": {
+									"Drivetrain": {
+										"description": "Drivetrain part of the bike",
+										"type": "string",
+										"properties": {
+											"area": {
+												"description": "type of chassis part",
+												"type": "string",
+												"enum": ["Front Derailleur", "Rear Derailleur", "Gear levers"]
+											}
+										}
+									}
+								}
+							}
+						]
+					}
+				}
+			},
+			"NewOrder": {
+				"type": "object",
+				"required": ["id"],
+				"properties": {
+					"id": {
+						"description": "ID of the order",
+						"type": "string"
+					}
+				}
+			},
+			"Order": {
+				"type": "object",
+				"required": ["name", "type", "price"],
+				"properties": {
+					"name": {
+						"description": "Name of the order",
+						"type": "string"
+					},
+					"price": {
+						"maxLength": 9,
+						"minLength": 2,
+						"description": "Price of the order, in euro's. Without commas. So €20.00 is 2000.",
+						"type": "integer"
+					},
+					"bikes": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/BikeTypes"
+								},
+								{
+									"$ref": "#/components/schemas/Bike"
+								}
+							]
+						}
+					}
+				}
+			}
+		},
+		"requestBodies": {
+			"createBike": {
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Bike"
+						}
+					}
+				}
+			},
+			"createOrder": {
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Order"
+						}
+					}
+				}
+			}
+		},
+		"parameters": {
+			"queryParameterLimit": {
+				"name": "limit",
+				"in": "query",
+				"description": "Maximum amount of items returned.",
+				"schema": {
+					"type": "integer"
+				}
+			}
+		},
+		"responses": {
+			"createBike200": {
+				"description": "Successful operation",
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/NewBike"
+								},
+								{
+									"$ref": "#/components/schemas/Bike"
+								}
+							]
+						}
+					}
+				}
+			},
+			"getBikeTypes200": {
+				"description": "Successful operation",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/BikeTypes"
+						}
+					}
+				}
+			},
+			"createOrder200": {
+				"description": "Successful operation",
+				"content": {
+					"application/json": {
+						"schema": {
+							"type": "object",
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/NewOrder"
+								},
+								{
+									"$ref": "#/components/schemas/Order"
+								}
+							]
+						}
+					}
+				}
+			},
+			"unauthenticatedUser401": {
+				"description": "Unauthenticated user.\n\n* HTTPS://PRODUCTION.API.ALPHADOC.COM/ERRORS/ADDITIONALAUTHENTICATIONREQUIRED/V1.0.0\nThe 401 status code indicates that the user is not authenticated.\n\n* This means that the user has not provided valid credentials to access the API.\n\n* The user must authenticate in order to access the API and its resources.\n\n* Without authentication, the user will not be able to access the API."
+			}
+		},
+		"securitySchemes": {
+			"basic_authentication": {
+				"type": "http",
+				"scheme": "basic"
+			},
+			"bearer_authentication": {
+				"type": "http",
+				"scheme": "bearer",
+				"bearerFormat": "JWT"
+			},
+			"api_key_authentication_header": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "X-API-KEY-HEADER"
+			},
+			"api_key_authentication_query": {
+				"type": "apiKey",
+				"in": "query",
+				"name": "X-API-KEY-QUERY"
+			},
+			"api_key_authentication_cookie": {
+				"type": "apiKey",
+				"in": "cookie",
+				"name": "X-API-KEY-COOKIE"
+			},
+			"openid": {
+				"type": "openIdConnect",
+				"openIdConnectUrl": "https://bikeshop.bike/openid-configuration"
+			},
+			"oauth2": {
+				"type": "oauth2",
+				"flows": {
+					"implicit": {
+						"authorizationUrl": "https://example.com/api/oauth/dialog",
+						"refreshUrl": "https://example.com/api/oauth/refresh",
+						"scopes": {
+							"write:bikes": "modify bikes in your organisation",
+							"read:bikes": "read your bikes in your organisation",
+							"write:parts": "create parts in the bikeshop",
+							"read:parts": "read parts in the bikehop",
+							"write:orders": "create orders in the bikeshop",
+							"read:orders": "read orders in the bikehop"
+						}
+					},
+					"password": {
+						"tokenUrl": "https://example.com/api/oauth/password",
+						"refreshUrl": "https://example.com/api/oauth/refresh",
+						"scopes": {
+							"write:bikes": "modify bikes in your organisation",
+							"read:bikes": "read your bikes in your organisation",
+							"write:parts": "create parts in the bikeshop",
+							"read:parts": "read parts in the bikehop",
+							"write:orders": "create orders in the bikeshop",
+							"read:orders": "read orders in the bikehop"
+						}
+					},
+					"authorizationCode": {
+						"authorizationUrl": "https://example.com/api/oauth/dialog",
+						"refreshUrl": "https://example.com/api/oauth/refresh",
+						"tokenUrl": "https://example.com/api/oauth/token",
+						"scopes": {
+							"write:bikes": "modify bikes in your organisation",
+							"read:bikes": "read your bikes in your organisation",
+							"write:parts": "create parts in the bikeshop",
+							"read:parts": "read parts in the bikehop",
+							"write:orders": "create orders in the bikeshop",
+							"read:orders": "read orders in the bikehop"
+						}
+					},
+					"clientCredentials": {
+						"tokenUrl": "https://example.com/api/oauth/password",
+						"refreshUrl": "https://example.com/api/oauth/refresh",
+						"scopes": {
+							"write:bikes": "modify bikes in your organisation",
+							"read:bikes": "read your bikes in your organisation",
+							"write:parts": "create parts in the bikeshop",
+							"read:parts": "read parts in the bikehop",
+							"write:orders": "create orders in the bikeshop",
+							"read:orders": "read orders in the bikehop"
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -75,8 +75,7 @@ jobs:
 | OPENAPI_FILE | Relative path to the OpenAPI file from the root of your repo |
 | PROJECT_ID   | Alphadoc Project ID                                          |
 | DOCUMENT_ID  | Alphadoc Document ID                                         |
-| USERNAME     | Name of the user                                             |
-| PASSWORD     | Password of the user. Store this in a Github Secret.         |
+| APIKEY       | Alphadoc API KEY                                             |
 
 ## Development
 
