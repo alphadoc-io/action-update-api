@@ -26,7 +26,7 @@ Visit to the editor (https://{yourcompanyname}.alphadoc.io/editor), click on you
 
 Follow the same steps as for the Project ID to configure the Document ID as a Github Action variable.
 
-### Alphadoc Username and Password
+### Add API Key
 
 As the final step of the process, generate an Alpadoc API Key by visiting
 `<ORGANIZATION>.alphadoc.io/editor/settings/organization?section=api_key`
@@ -59,7 +59,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Checkout alphadoc update-action
-        uses: alphadoc-io/action-update-api@v1
+        uses: alphadoc-io/action-update-api@v2
         with:
           OPENAPI_FILE: "packages/ui/public/bikeshop-openapi.json"
           ORGANISATION: ${{ vars.ALPHADOC_ORGANISATION }}
@@ -79,5 +79,5 @@ jobs:
 
 ## Development
 
-The master branch is `v1`. Contributions are welcome! Please create a
+The master branch is `v2`. Contributions are welcome! Please create a
 [Pull Request](https://github.com/alphadoc-io/action-update-api/pulls)
