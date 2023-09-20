@@ -17,6 +17,9 @@ inputs:
   APIKEY:
     description: "API Key to authenticate the request"
     required: true
+  HOSTNAME:
+    description: "Hostname minus the organization subdomain"
+    default: alphadoc.io
 
 runs:
   using: "composite"
@@ -41,7 +44,7 @@ runs:
             "document": "${{ env.base64 }}",
             "documentType": "application/json"
           }' \
-          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
+          "https://${{ inputs.ORGANISATION }}.${{ inputs.HOSTNAME }}/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
         version_id=$(echo "$version_response" | jq -r '.id')
         echo "versionId=$version_id" >> $GITHUB_ENV
 
@@ -52,4 +55,4 @@ runs:
           -H "X-API-KEY: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
           -d '{ "default": true }' \
-          "https://${{ inputs.ORGANISATION }}.alphadoc.io/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
+          "https://${{ inputs.ORGANISATION }}.${{ inputs.HOSTNAME }}/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
