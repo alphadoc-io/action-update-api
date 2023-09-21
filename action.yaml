@@ -40,7 +40,6 @@ runs:
           -H "X-API-KEY: ${{ inputs.APIKEY }}" \
           -H "Content-Type: application/json" \
           -d '{
-            "default": true,
             "document": "${{ env.base64 }}",
             "documentType": "application/json"
           }' \
