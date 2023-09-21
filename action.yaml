@@ -52,4 +52,4 @@ runs:
       run: |
         curl -f -s -X PUT \
           -H "X-API-KEY: ${{ inputs.APIKEY }}" \
-          "https://${{ inputs.ORGANISATION }}.${{ inputs.HOSTNAME }}/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}"
+          "https://${{ inputs.ORGANISATION }}.${{ inputs.HOSTNAME }}/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}/publish"
