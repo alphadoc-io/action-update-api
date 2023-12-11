@@ -5,16 +5,16 @@ inputs:
   OPENAPI_FILE:
     description: "Relative path to the OpenAPI file from the root of your repo"
     required: true
-  ORGANISATION:
-    description: "Alphadoc organisation name, subdomain of your url."
+  ORGANIZATION:
+    description: "Alphadoc organization name, subdomain of your url."
     required: true
-  PROJECT_ID:
-    description: "Alphadoc Project ID"
+  PROJECT_VERSION_ID:
+    description: "Alphadoc Project Version ID"
     required: true
-  DOCUMENT_ID:
-    description: "Alphadoc Document ID"
+  API_SPEC_ID:
+    description: "Alphadoc API Specification ID"
     required: true
-  APIKEY:
+  API_KEY:
     description: "API Key to authenticate the request"
     required: true
   HOSTNAME:
@@ -37,19 +37,26 @@ runs:
       shell: bash
       run: |
         version_response=$(curl -f -s -X POST \
-          -H "X-API-KEY: ${{ inputs.APIKEY }}" \
+          -H "X-API-KEY: ${{ inputs.API_KEY }}" \
           -H "Content-Type: application/json" \
           -d '{
-            "document": "${{ env.base64 }}",
-            "documentType": "application/json"
+            "apiSpec": "${{ env.base64 }}",
+            "apiSpecType": "application/json"
           }' \
-          "https://${{ inputs.ORGANISATION }}.${{ inputs.HOSTNAME }}/v1/documents/${{ inputs.DOCUMENT_ID }}/versions")
+          "https://${{ inputs.ORGANIZATION }}.${{ inputs.HOSTNAME }}/v1/projectVersions/${{ inputs.PROJECT_VERSION_ID }}/apiSpecs/${{ inputs.API_SPEC_ID }}/versions")
         version_id=$(echo "$version_response" | jq -r '.id')
         echo "versionId=$version_id" >> $GITHUB_ENV
 
-    - name: Publish document
+    - name: Set API specification as default
       shell: bash
       run: |
         curl -f -s -X PUT \
-          -H "X-API-KEY: ${{ inputs.APIKEY }}" \
-          "https://${{ inputs.ORGANISATION }}.${{ inputs.HOSTNAME }}/v1/documents/${{ inputs.DOCUMENT_ID }}/versions/${{ env.versionId }}/publish"
+          -H "X-API-KEY: ${{ inputs.API_KEY }}" \
+          "https://${{ inputs.ORGANIZATION }}.${{ inputs.HOSTNAME }}/v1/projectVersions/${{ inputs.PROJECT_VERSION_ID }}/apiSpecs/${{ inputs.API_SPEC_ID }}/versions/${{ env.versionId }}"
+
+    - name: Publish Project Version
+      shell: bash
+      run: |
+        curl -f -s -X PUT \
+          -H "X-API-KEY: ${{ inputs.API_KEY }}" \
+          "https://${{ inputs.ORGANIZATION }}.${{ inputs.HOSTNAME }}/v1/projectVersions/${{ inputs.PROJECT_VERSION_ID }}/publish"

@@ -1,40 +1,40 @@
 # action-update-api
 
-This is a repository contains a [GitHub action](https://docs.github.com/en/actions)
+This repository contains a [GitHub action](https://docs.github.com/en/actions)
 that takes an [OpenAPI](https://www.openapis.org) spec file and uploads it
 to [alphadoc](https://alphadoc.io).
 
 ## Setup
 
-### Alphadoc Organisation
+### Alphadoc Organization
 
-Follow [these steps](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository) to set the Alphadoc Organisation as an environment variable for your repo. Name the variable "ALPHADOC_ORGANISATION" and assign the Organisation value to it. If my login link is https://demo.alphadoc.io, than my organisation name is `demo`.
+Follow [these steps](https://docs.github.com/en/actions/learn-github-actions/variables#creating-configuration-variables-for-a-repository) to set the Alphadoc Organization as an environment variable for your repo. Name the variable "ALPHADOC_ORGANIZATION" and assign the Organization value to it. If my login link is https://demo.alphadoc.io, then my organization name is `demo`.
 
-### Alphadoc Project ID
+### Alphadoc Project Version ID
 
-Visit to the editor https://{organisation}.alphadoc.io/editor, click on your Project and retrieve the Project ID from the URL. The first value after `editor` is the Project ID. In our example the Project ID is `a6bf4715-111d-4d59-bcd4-de90aa725b93`.
+Visit to the editor https://{organization}.alphadoc.io/editor, click on your Project and retrieve the Project Version ID from the URL. The first value after `editor` is the Project Version ID. In our example the Project Version ID is `a6bf4715-111d-4d59-bcd4-de90aa725b93`.
 
 ```
 https://demo.alphadoc.io/editor/a6bf4715-111d-4d59-bcd4-de90aa725b93/pages/26e3aba7-77e0-4f70-9554-8e827fe90b44
 ```
 
-Follow the same steps as for the Organisation to configure the Project ID as a Github Action variable.
+Follow the same steps as for the Organization to configure the Project Version ID as a Github Action variable.
 
-### Alphadoc Document ID
+### Alphadoc API Spec ID
 
-Visit to the editor (https://{yourcompanyname}.alphadoc.io/editor), click on your Project and go to the API upload section. Inspect the network tab and grab the ID that is returned in the `items` parameter in the `GET /documents` endpoint.
+Visit to the editor (https://{yourcompanyname}.alphadoc.io/editor), click on your Project and go to the API upload section. Inspect the network tab and grab the ID that is returned in the `items` parameter in the `GET /v1/projectVersions/{projectVersionId}/apiSpecs` endpoint.
 
-Follow the same steps as for the Project ID to configure the Document ID as a Github Action variable.
+Follow the same steps as for the Project Version ID to configure the API Specification ID as a Github Action variable.
 
 ### Add API Key
 
 As the final step of the process, generate an Alpadoc API Key by visiting
-`<ORGANIZATION>.alphadoc.io/editor/settings/organization?section=api_key`
+`<ORGANIZATION>.alphadoc.io/editor/settings/user/api-keys`
 and clicking `Generate API Key`.
 
 Copy the generated API key to you clipboard and go to
 [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets#about-encrypted-secrets)
-in Github. Save the secret as "ALPHADOC_APIKEY".
+in Github. Save the secret as "ALPHADOC_API_KEY".
 
 ### Location of OpenAPI file
 
@@ -59,25 +59,25 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Checkout alphadoc update-action
-        uses: alphadoc-io/action-update-api@v2
+        uses: alphadoc-io/action-update-api@v3
         with:
           OPENAPI_FILE: "packages/ui/public/bikeshop-openapi.json"
-          ORGANISATION: ${{ vars.ALPHADOC_ORGANISATION }}
-          PROJECT_ID: ${{ vars.ALPHADOC_PROJECT_ID }}
-          DOCUMENT_ID: ${{ vars.ALPHADOC_DOCUMENT_ID }}
-          APIKEY: ${{ secrets.ALPHADOC_APIKEY }}
+          ORGANIZATION: ${{ vars.ALPHADOC_ORGANIZATION }}
+          PROJECT_VERSION_ID: ${{ vars.ALPHADOC_PROJECT_VERSION_ID }}
+          API_SPEC_ID: ${{ vars.ALPHADOC_API_SPEC_ID }}
+          API_KEY: ${{ secrets.ALPHADOC_API_KEY }}
 ```
 
 ## Parameters
 
-| Parameter    | Description                                                  |
-| ------------ | ------------------------------------------------------------ |
-| OPENAPI_FILE | Relative path to the OpenAPI file from the root of your repo |
-| PROJECT_ID   | Alphadoc Project ID                                          |
-| DOCUMENT_ID  | Alphadoc Document ID                                         |
-| APIKEY       | Alphadoc API KEY                                             |
+| Parameter          | Description                                                  |
+| ------------------ | ------------------------------------------------------------ |
+| OPENAPI_FILE       | Relative path to the OpenAPI file from the root of your repo |
+| PROJECT_VERSION_ID | Alphadoc Project Version ID                                  |
+| API_SPEC_ID        | Alphadoc API Specification ID                                |
+| API_KEY            | Alphadoc API KEY                                             |
 
 ## Development
 
-The master branch is `v2`. Contributions are welcome! Please create a
+The main branch is `v3`. Contributions are welcome! Please create a
 [Pull Request](https://github.com/alphadoc-io/action-update-api/pulls)
