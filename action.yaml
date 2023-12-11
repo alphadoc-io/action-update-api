@@ -57,6 +57,6 @@ runs:
     - name: Publish Project Version
       shell: bash
       run: |
-        curl -f -s -X PUT \
+        curl -f -s -X POST \
           -H "X-API-KEY: ${{ inputs.API_KEY }}" \
           "https://${{ inputs.ORGANIZATION }}.${{ inputs.HOSTNAME }}/v1/projectVersions/${{ inputs.PROJECT_VERSION_ID }}/publish"
