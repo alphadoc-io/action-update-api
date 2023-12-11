@@ -22,7 +22,7 @@ Follow the same steps as for the Organization to configure the Project Version I
 
 ### Alphadoc API Spec ID
 
-Visit to the editor (https://{yourcompanyname}.alphadoc.io/editor), click on your Project and go to the API upload section. Inspect the network tab and grab the ID that is returned in the `items` parameter in the `GET /v1/projectVersions/{projectVersionId}/apiSpecs` endpoint.
+Visit to the editor (https://{yourcompanyname}.alphadoc.io/editor), click on your Project and go to the API upload section. Click the three-dots menu and copy the API Specification ID.
 
 Follow the same steps as for the Project Version ID to configure the API Specification ID as a Github Action variable.
 
